@@ -3,6 +3,11 @@ function SeatReservation(name, initialMeal) {
     var self = this;
     self.name = name;
     self.meal = ko.observable(initialMeal);
+
+    self.formattedPrice = ko.computed(function() {
+        var price = self.meal().price;
+        return price ? "$" + price.toFixed(2) : "None";
+    });
 }
 
 // Overall viewmodel for this screen, along with initial state
@@ -18,13 +23,23 @@ function ReservationsViewModel() {
 
     // Editable data
     self.seats = ko.observableArray([
-        new SeatReservation("Steve", self.availableMeals[1]),
-        new SeatReservation("Bert", self.availableMeals[2])
+        new SeatReservation("Steve", self.availableMeals[0]),
+        new SeatReservation("Bert", self.availableMeals[1])
     ]);
 
+    // Operations
     self.addSeat = function() {
-        self.seats.push(new SeatReservation("hiroaki", self.availableMeals[2]));
+        self.seats.push(new SeatReservation("hiroaki", self.availableMeals[0]));
     }
+
+    self.removeSeat = function(seat) { self.seats.remove(seat) }
+
+    self.totalSurcharge = ko.computed(function() {
+       var total = 0;
+       for (var i = 0; i < self.seats().length; i++)
+           total += self.seats()[i].meal().price;
+       return total;
+    });
 }
 
 ko.applyBindings(new ReservationsViewModel());
